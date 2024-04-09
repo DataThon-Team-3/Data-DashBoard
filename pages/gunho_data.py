@@ -18,10 +18,10 @@ india_gpd['Rural_ratio'] = india_gpd['Rural'] / india_gpd['Population'] * 100
 # 주별 인구대비 도시인구
 india_gpd['Urban_ratio'] = india_gpd['Urban'] / india_gpd['Population'] * 100
 
-india_gpd_table = india_gpd[['Qty', 'Amount', 'Population', 'Male', 'Female', 'Rural', 'Urban']].sort_values(by='Amount', ascending=False)
+india_gpd_table = india_gpd[['Qty', 'Amount', 'Population', 'Male', 'Female', 'Rural', 'Urban','Amount_population', 'Rural_ratio']]
 
 
-def create_choropleth_mapbox(color_col, title):
+def create_choropleth_mapbox(color_col, label_text):
     fig = px.choropleth_mapbox(data_frame=india_gpd,
                                geojson=india_gpd.geometry,
                                locations=india_gpd.index,
@@ -32,19 +32,19 @@ def create_choropleth_mapbox(color_col, title):
                                zoom=3,
                                center={"lat": india_gpd['lat'].mean(), "lon": india_gpd['lon'].mean()},
                                opacity=0.5,
-                               labels={color_col:'매출 금액'}
+                               labels={color_col: label_text}
                               )
 
     fig.update_layout(
         margin={"r":0,"t":0,"l":0,"b":0},
-        title={
-            'text': title,
-            'y': 0.95,
-            'x': 0.5,
-            'xanchor': 'center',
-            'yanchor': 'top',
-            'font': {'size': 24}
-        }
+        # title={
+        #     'text': title,
+        #     'y': 0.95,
+        #     'x': 0.5,
+        #     'xanchor': 'center',
+        #     'yanchor': 'top',
+        #     'font': {'size': 24}
+        # }
     )
 
     return fig
