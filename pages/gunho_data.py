@@ -21,12 +21,12 @@ india_gpd['Urban_ratio'] = india_gpd['Urban'] / india_gpd['Population'] * 100
 india_gpd_table = india_gpd[['Qty', 'Amount', 'Population', 'Male', 'Female', 'Rural', 'Urban','Amount_population', 'Rural_ratio']]
 
 
-def create_choropleth_mapbox(color_col, label_text):
+def create_choropleth_mapbox(color_col, label_text, color_style):
     fig = px.choropleth_mapbox(data_frame=india_gpd,
                                geojson=india_gpd.geometry,
                                locations=india_gpd.index,
                                color=color_col,
-                               color_continuous_scale="BuGn",
+                               color_continuous_scale=color_style,
                                range_color=(india_gpd[color_col].min(), india_gpd[color_col].max()),
                                mapbox_style="carto-positron",
                                zoom=3,
