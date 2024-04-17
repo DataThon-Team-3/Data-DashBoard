@@ -31,7 +31,7 @@ india_gpd['Rural_ratio'] = india_gpd['Rural'] / india_gpd['Population'] * 100
 # 주별 인구대비 도시인구
 india_gpd['Urban_ratio'] = india_gpd['Urban'] / india_gpd['Population'] * 100
 
-india_gpd_table = india_gpd[['Qty', 'Amount', 'Population', 'Male', 'Female', 'Rural', 'Urban','Amount_population', 'Rural_ratio']]
+india_gpd_table = india_gpd[['Qty', 'Amount', 'Population', 'Rural', 'Urban','Amount_population', 'Rural_ratio']]
 
 
 def create_choropleth_mapbox(color_col, label_text, color_style):
@@ -78,22 +78,14 @@ col1, col2, col3 = st.columns([6.5, 1, 2.5])
 
 with col1:
     plan = st.selectbox('Plan',
-        ('plan1','plan2', 'plan3')
+        ('plan1','plan2')
     )
     if plan == 'plan1':
-        st.markdown('<div style="font-size:18px; font-weight:bold;">주 별 매출금액이 낮은 지역에 위치 제안</div>', unsafe_allow_html=True)
-    elif plan == 'plan2':
         st.markdown('<div style="font-size:18px; font-weight:bold;">주 별 인구대비 매출비율이 낮은 지역에 위치 제안</div>', unsafe_allow_html=True)
     else:
         st.markdown('<div style="font-size:18px; font-weight:bold;">주 별 인구대비 시골인구비율이 높은 지역에 위치 제안</div>', unsafe_allow_html=True)
     
 if plan == 'plan1':
-    # 주 별 매출금액 시각화
-    fig = create_choropleth_mapbox('Amount', '매출금액', 'Turbo')
-    st.plotly_chart(fig)
-    st.dataframe(india_gpd_table.sort_values(by='Amount', ascending=True))
-    state_name = india_gpd_table.sort_values(by='Amount', ascending=True)
-elif plan == 'plan2':
     # 주 별 인구대비 매출금액 시각화
     fig = create_choropleth_mapbox('Amount_population', '매출%', 'Turbo')
     st.plotly_chart(fig)
