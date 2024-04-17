@@ -135,8 +135,6 @@ elif option == "주문량에 따른 웨어하우스 위치 제안":
         center={"lat": 18.15, "lon": 79.09},
         hover_data=["state", "Total_Population"],
         opacity=0.8,
-        height=1024,
-        width=512,
     )
     wh_geo = wh.merge(india_zipcode_to_geo, left_on="postal_code", right_on="zipcode")[
         ["code", "lat", "long"]
@@ -162,6 +160,7 @@ elif option == "주문량에 따른 웨어하우스 위치 제안":
         marker_color="rgb(0, 235, 100)",
         name="Suggested Warehouse Location",
     )
+    fig.update_layout(legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01))
     st.plotly_chart(fig)
 
 
