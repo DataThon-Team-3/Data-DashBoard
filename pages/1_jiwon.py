@@ -1,33 +1,76 @@
 import streamlit as st
-import time
-import numpy as np
+import pandas as pd
+from keras.models import load_model
+from recommend import score_matrix, recommend
+from recommend_data import review_ratings
 
-st.set_page_config(page_title="Plotting Demo", page_icon="📈")
+def main():
+    st.title('Neural Collaborative Filtering (NCF)기반 추천 시스템')
+    st.caption('*사용자 id를 입력하세요*:sunglasses:')
 
-st.markdown("# Plotting Demo")
-st.sidebar.header("Plotting Demo")
-st.write(
-    """This demo illustrates a combination of plotting and animation with
-Streamlit. We're generating a bunch of random numbers in a loop for around
-5 seconds. Enjoy!"""
-)
+    rec_model = load_model('models/recommend_model.keras')
 
-progress_bar = st.sidebar.progress(0)
-status_text = st.sidebar.empty()
-last_rows = np.random.randn(1, 1)
-chart = st.line_chart(last_rows)
+    # 측정 결과들 모아두는 df
+    if "df" not in st.session_state:
+        st.session_state.df = pd.DataFrame({
+            'product_id': [],
+            'pre_rating' : []
+        })
 
-for i in range(1, 101):
-    new_rows = last_rows[-1, :] + np.random.randn(5, 1).cumsum(axis=0)
-    status_text.text("%i%% Complete" % i)
-    chart.add_rows(new_rows)
-    progress_bar.progress(i)
-    last_rows = new_rows
-    time.sleep(0.05)
+        st.session_state.df2 = pd.DataFrame({
+            'user_id': review_ratings['user_id'],
+            'count':review_ratings['rating']
+        })
 
-progress_bar.empty()
+    with st.form(key='문장입력 form'):
+        userId = st.text_input("사용자 ID:")
+        form_submitted = st.form_submit_button('상품 추천')
 
-# Streamlit widgets automatically run the script from top to bottom. Since
-# this button is not connected to any other logic, it just causes a plain
-# rerun.
-st.button("Re-run")
+    if form_submitted:
+        if userId:
+            recommend_item = recommend(userId, rec_model, score_matrix, 5)
+
+            st.session_state.df = pd.DataFrame({
+                'product_id': recommend_item['parent_asin'],
+                'pre_rating' : recommend_item['pred_rating']
+            })
+            
+    
+            st.success('성공!')
+        else:
+            st.write("사용자 ID를 입력하시요.")
+            st.error('존재하지 않는 사용자입니다.')
+
+    st.divider()
+    col1, col2, col3= st.columns(3)
+    
+    # df 크기 조절
+    col1.checkbox("창 크기조절", value=True, key="use_container_width")
+
+    # df 리셋 버튼
+    if col2.button("데이터 리셋하기"):
+        st.session_state.df = pd.DataFrame({
+            'product_id': [],
+            'pre_rating' : []
+        })
+
+    # df csv로 다운로드
+    @st.cache_data
+    def convert_df(df):
+        return df.to_csv(index=False, header=True).encode('cp949')
+    csv = convert_df(st.session_state.df)
+    col3.download_button(
+        label="CSV로 다운받기",
+        data=csv,
+        file_name='sts_data_outputs.csv',
+        mime='text/csv',
+    )
+
+    st.dataframe(st.session_state.df, use_container_width=st.session_state.use_container_width)
+
+
+    st.subheader('User_id 리스트', divider='rainbow')
+
+    st.dataframe(st.session_state.df2, use_container_width=st.session_state.use_container_width)
+
+main()
