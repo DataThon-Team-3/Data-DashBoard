@@ -64,7 +64,7 @@ def create_choropleth_mapbox(color_col, label_text, color_style):
 
 st.title("Amazon Easystore 위치 제안")
 
-st.sidebar.success("Select a demo above.")
+
 
 st.markdown(
     """
